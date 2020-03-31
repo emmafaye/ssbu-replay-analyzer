@@ -1,0 +1,1 @@
+docker build -t ssbu-match-analyzer .
