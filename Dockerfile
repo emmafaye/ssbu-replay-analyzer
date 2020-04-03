@@ -7,7 +7,7 @@ ENV TZ=America/Los_Angeles
 # Python Dependencies
 # COPY requirements.txt ./
 # RUN pip install --no-cache-dir -r requirements.txt
-RUN pip install opencv-contrib-python imutils pytesseract pillow
+RUN pip install nms opencv-contrib-python imutils pytesseract pillow
 
 # Develop Tools
 RUN pip install coloredlogs

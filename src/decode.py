@@ -1,19 +1,14 @@
 import numpy as np
 import cv2
 
-#
 # rects are rectangles encoded as [x, y, w, h] and used predominately by openCV
 # boxes are rectangles encoded as [ulx, uly, lrx, lry]
-#
-#
 #
 # returns:
 #   rects -- an array of [x, y, w, h] that describe rectangles
 #   confidences -- an array of floats correstponding to each rectangle in rects
 #   baggage -- an array of dictionaries that contain info about each rect including its offset and angle
-#
 def decode(scores, geometry, confidenceThreshold):
-    
     # grab the number of rows and columns from the scores volume, then
     # initialize our set of bounding box rectangles and corresponding confidence scores
     (numRows, numCols) = scores.shape[2:4]
@@ -78,12 +73,9 @@ def decode(scores, geometry, confidenceThreshold):
     
     return (rects, confidences, baggage)
                  
-
-#
 # returns:
 #   boxes - an array of rects defined by (ulx, uly, lrx, lry)
 #   confidences - an array of floats associated with each rect
-#
 def decodeBoundingBoxes(scores, geometry, confidenceThreshold):
     
     from geom import rotatePoints
@@ -140,13 +132,10 @@ def decodeBoundingBoxes(scores, geometry, confidenceThreshold):
             
     return boxes, confidences
 
-        
-#
 # returns:
 #   boxes - an array of rects defined by (upperLeftX, upperLeftY, lowerLeftX, lowerLeftY)
 #   confidences - an array of confidences associated with each rect in rects
-#   baggage -- an array of dictionaries that contain info about each rect including its offset and angle
-#             
+#   baggage -- an array of dictionaries that contain info about each rect including its offset and angle             
 def pisDecode(scores, geometry, confidenceThreshold):
     
     (numRows, numCols) = scores.shape[2:4]
