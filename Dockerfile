@@ -1,18 +1,27 @@
 FROM python:buster
 
 WORKDIR /usr/src/app
+ENV TZ=America/Los_Angeles
+# ENV ZSH_CUSTOM=/root/.oh-my-zsh/custom
 
+# Python Dependencies
 # COPY requirements.txt ./
 # RUN pip install --no-cache-dir -r requirements.txt
-RUN pip install imutils
-RUN pip install numpy
-RUN pip install pytesseract
-RUN pip install argparse
-RUN pip install opencv-python
+RUN pip install opencv-contrib-python imutils pytesseract pillow
+
+# Develop Tools
+RUN pip install coloredlogs
+RUN apt-get update && apt-get install -y zsh vim
+RUN wget https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh -O - | zsh || true
+RUN git clone https://github.com/reobin/typewritten.git /root/.oh-my-zsh/custom/themes/typewritten
+RUN ln -s "/root/.oh-my-zsh/custom/themes/typewritten/typewritten.zsh-theme" "/root/.oh-my-zsh/custom/themes/typewritten.zsh-theme"
+ADD dev/.zshrc /root
+
+# Tesseract
+RUN echo "deb https://notesalexp.org/tesseract-ocr/buster/ buster main" >> /etc/apt/sources.list
+RUN wget -O - https://notesalexp.org/debian/alexp_key.asc | apt-key add -
+RUN apt-get update && apt-get install -y apt-transport-https tesseract-ocr
 
 # VOLUME [ "/usr/src/data" ]
 
-# COPY . .
-
-CMD [ "/bin/bash" ]
-#ENTRYPOINT [ "/bin/bash" ]
+CMD [ "/bin/zsh" ]
