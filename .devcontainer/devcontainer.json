@@ -1,0 +1,73 @@
+// For format details, see https://aka.ms/vscode-remote/devcontainer.json or this file's README at:
+// https://github.com/microsoft/vscode-dev-containers/tree/v0.106.0/containers/docker-existing-dockerfile
+{
+	"name": "ssbu-match-analyzer",
+
+	// Sets the run context to one level up instead of the .devcontainer folder.
+	"context": "..",
+
+	// Update the 'dockerFile' property if you aren't using the standard 'Dockerfile' filename.
+	"dockerFile": "..\\Dockerfile",
+
+	// Set *default* container specific settings.json values on container create.
+	"settings": {
+		"remote.extensionKind": {
+			"ms-azuretools.vscode-docker": [ "workspace" ],
+			"thomaskarachristos.terminal-statusbar": [ "workspace" ],
+			"msjsdiag.debugger-for-chrome": [ "workspace" ]
+		},
+		"git.enableSmartCommit": true,
+		"terminal.integrated.shell.windows": "C:\\Program Files\\Git\\bin\\bash.exe",
+		"terminal.integrated.shell.linux": "/bin/zsh",
+		"terminal.integrated.copyOnSelection": true,
+		"terminal.integrated.cursorBlinking": true,
+		"terminal.integrated.fontWeightBold": "500",
+		"TerminalStatusBar.ToggleEditStatusBar": true,
+		"window.titleBarStyle": "custom",
+    	"window.customMenuBarAltFocus": false,
+		"files.eol": "\n",
+		"files.exclude": {
+			"**/__pycache__": true
+		},
+		"python.jediEnabled": true,
+		"python.linting.pylintArgs": ["--load-plugins"],
+		"editor.suggestSelection": "first",
+		"vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
+		"resmon.show.cpuusage": true, // Show CPU Usage. In Windows, this percentage is calculated with processor time, which doesn't quite match the task manager figure.
+		"resmon.show.mem": true, // Show consumed and total memory as a fraction.
+		"resmon.show.cpufreq": false, // Show CPU Frequency.
+		"resmon.show.battery": false, // Show battery percentage remaining.
+		"resmon.show.disk": false // Toggles the display of disk space information.
+	},
+
+	// Add the IDs of extensions you want installed when the container is created.
+	"extensions": [
+		"hookyqr.beautify",
+		"ms-azuretools.vscode-docker",
+		"dbaeumer.vscode-eslint",
+		"dbaeumer.jshint",
+		"ms-python.python",
+		"visualstudioexptteam.vscodeintellicode",
+		"thomaskarachristos.terminal-statusbar",
+		"mutantdino.resourcemonitor"
+	],
+
+	"shutdownAction": "stopContainer"
+
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	// "forwardPorts": [],
+
+	// Uncomment the next line to run commands after the container is created - for example installing git.
+	// "postCreateCommand": "apt-get update && apt-get install -y git",
+
+	// Uncomment when using a ptrace-based debugger like C++, Go, and Rust
+	// "runArgs": [ "--cap-add=SYS_PTRACE", "--security-opt", "seccomp=unconfined" ],
+
+	// Uncomment to use the Docker CLI from inside the container. See https://aka.ms/vscode-remote/samples/docker-in-docker.
+	// "mounts": [ "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind" ],
+
+	// Uncomment to connect as a non-root user. See https://aka.ms/vscode-remote/containers/non-root.
+	// "remoteUser": "vscode",
+
+	// "remoteEnv": { "MY_VARIABLE": "some-value" }
+}

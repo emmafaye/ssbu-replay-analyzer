@@ -1,0 +1,12 @@
+{
+    "telemetry.enableCrashReporter": false,
+    "files.autoSave": "afterDelay",
+    "workbench.colorTheme": "Dracula",
+    "workbench.iconTheme": "material-icon-theme",
+    "editor.fontSize": 12,
+    "terminal.integrated.fontSize": 12,
+    "debug.console.fontSize": 12,
+    "debug.console.fontFamily": "Fira Code",
+    "editor.fontFamily": "Fira Code, Consolas, 'Courier New', monospace",
+    "editor.fontLigatures": true
+}

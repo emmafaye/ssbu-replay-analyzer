@@ -15,7 +15,7 @@ RUN apt-get update && apt-get install -y zsh vim
 RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 RUN git clone https://github.com/reobin/typewritten.git /root/.oh-my-zsh/custom/themes/typewritten
 RUN ln -s "/root/.oh-my-zsh/custom/themes/typewritten/typewritten.zsh-theme" "/root/.oh-my-zsh/custom/themes/typewritten.zsh-theme"
-ADD dev/.zshrc /root
+ADD .devcontainer/.zshrc /root
 
 # Tesseract
 RUN echo "deb https://notesalexp.org/tesseract-ocr/buster/ buster main" >> /etc/apt/sources.list
