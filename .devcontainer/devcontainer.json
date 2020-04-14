@@ -29,6 +29,7 @@
 		"files.exclude": {
 			"**/__pycache__": true
 		},
+		"python.pythonPath": "/usr/local/bin/python",
 		"python.jediEnabled": true,
 		"python.linting.pylintArgs": ["--load-plugins"],
 		"editor.suggestSelection": "first",

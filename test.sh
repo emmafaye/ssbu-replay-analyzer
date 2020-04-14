@@ -1,12 +1,20 @@
+#!/bin/bash
+
 clear
 
+LAYOUT="raw_line"
+PADDING=0.2
+CONFIDENCE=0.9
+MIN_NMS=0.4
+
+echo "Layout: $LAYOUT, Padding: $PADDING, Confidence: $CONFIDENCE, Minimum NMS: $MIN_NMS"
+
 # Control
-python src/app.py --east data/frozen_east_text_detection.pb --image images/example_01.jpg
+python src/ocr.py -n $MIN_NMS -c $CONFIDENCE -p $PADDING -l $LAYOUT -i images/example_01.jpg -t "OH. OK"
 
 # Start / End / Stock Loss
-python src/app.py --east data/frozen_east_text_detection.pb --image images/go.png
-python src/app.py --east data/frozen_east_text_detection.pb --image images/game.png
-python src/app.py --east data/frozen_east_text_detection.pb --image images/game-cropped.png
-python src/app.py --east data/frozen_east_text_detection.pb --image images/game-cropped-adjusted.png
-python src/app.py --east data/frozen_east_text_detection.pb --image images/2-3.png
-python src/app.py --east data/frozen_east_text_detection.pb --image images/player-names.png
+python src/ocr.py -n $MIN_NMS -c $CONFIDENCE -p $PADDING -l $LAYOUT -i images/go.png -t "GO!" "Emberwyn" "CPU" "SONIC"
+python src/ocr.py -n $MIN_NMS -c $CONFIDENCE -p $PADDING -l $LAYOUT -i images/game.png -t "GAME!" "Emberwyn" "SONIC"
+python src/ocr.py -n $MIN_NMS -c $CONFIDENCE -p $PADDING -l $LAYOUT -i images/game-cropped-adjusted.png -t "GAME!"
+python src/ocr.py -n $MIN_NMS -c $CONFIDENCE -p $PADDING -l $LAYOUT -i images/2-3.png -t "2 - 3" "Emberwyn" "SONIC" "CPU" "-1" "1"
+python src/ocr.py -n $MIN_NMS -c $CONFIDENCE -p $PADDING -l $LAYOUT -i images/player-names.png -t "Zelda" "P1" "CPU" "Vs." "Emberwyn" "SONIC"
