@@ -129,4 +129,6 @@ dmypy.json
 .pyre/
 
 # Personal Stoof
-videos/
+assets/videos/*
+assets/matches/*
+assets/output/*
