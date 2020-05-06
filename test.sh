@@ -2,29 +2,35 @@
 
 clear
 
-LAYOUT="raw_line"
-PADDING=0.1
-CONFIDENCE=0.9
-MIN_NMS=0.4
+# for i in {0..35}
+# do
+    MAX_ANGLE=10
+    MIN_NMS=0.1
+    CONFIDENCE=0.9995
+    PADDING=0.07
+    LAYOUT=9
+    # MIN_NMS=`echo 0.01 \* $i | bc`
+    # PADDING=`echo 0.01 \* $i | bc`
 
-echo "Layout: $LAYOUT, Padding: $PADDING, Confidence: $CONFIDENCE, Minimum NMS: $MIN_NMS"
+    echo "Layout: $LAYOUT, Padding: $PADDING, Confidence: $CONFIDENCE, Minimum NMS: $MIN_NMS, Max Angle: $MAX_ANGLE"
 
-echo "--------------------------------------------------------------"
+    echo "--------------------------------------------------------------"
 
-# Reset Logging & Matches
-truncate -s 0 results.log
-rm assets/matches/*.*
+    # Reset Logging & Matches
+    truncate -s 0 results.log
+    rm assets/matches/*.*
 
-# Control
-python src/ocr.py -n $MIN_NMS -c $CONFIDENCE -p $PADDING -l $LAYOUT assets/images/example_01.jpg -t "OH" "OK" >> results.log
+    # Control
+    unbuffer python src/ocr.py -a $MAX_ANGLE -n $MIN_NMS -c $CONFIDENCE -p $PADDING -l $LAYOUT assets/images/example_01.jpg -t "OH" "OK"
 
-# Start / End / Stock Loss
-python src/ocr.py -n $MIN_NMS -c $CONFIDENCE -p $PADDING -l $LAYOUT assets/images/go.png -t "GO!" "Emberwyn" "CPU" "SONIC" >> results.log
-python src/ocr.py -n $MIN_NMS -c $CONFIDENCE -p $PADDING -l $LAYOUT assets/images/game.png -t "GAME!" "Emberwyn" "SONIC" >> results.log
-python src/ocr.py -n $MIN_NMS -c $CONFIDENCE -p $PADDING -l $LAYOUT assets/images/game-cropped-adjusted.png -t "GAME!" >> results.log
-python src/ocr.py -n $MIN_NMS -c $CONFIDENCE -p $PADDING -l $LAYOUT assets/images/2-3.png -t "2 - 3" "Emberwyn" "SONIC" "CPU" "-1" "1" >> results.log
-python src/ocr.py -n $MIN_NMS -c $CONFIDENCE -p $PADDING -l $LAYOUT assets/images/player-names.png -t "Zelda" "P1" "CPU" "Vs." "Emberwyn" "SONIC" >> results.log
+    # Start / End / Stock Loss
+    unbuffer python src/ocr.py -a $MAX_ANGLE -n $MIN_NMS -c $CONFIDENCE -p $PADDING -l $LAYOUT assets/images/go.png -t "GO!" "Emberwyn" "CPU" "SONIC"
+    unbuffer python src/ocr.py -a $MAX_ANGLE -n $MIN_NMS -c $CONFIDENCE -p $PADDING -l $LAYOUT assets/images/game.png -t "GAME!" "Emberwyn" "SONIC"
+    unbuffer python src/ocr.py -a $MAX_ANGLE -n $MIN_NMS -c $CONFIDENCE -p $PADDING -l $LAYOUT assets/images/game-cropped-adjusted.png -t "GAME!"
+    unbuffer python src/ocr.py -a $MAX_ANGLE -n $MIN_NMS -c $CONFIDENCE -p $PADDING -l $LAYOUT assets/images/2-3.png -t "Emberwyn" "SONIC" "CPU"
+    unbuffer python src/ocr.py -a $MAX_ANGLE -n $MIN_NMS -c $CONFIDENCE -p $PADDING -l $LAYOUT assets/images/player-names.png -t "Zelda" "P1" "CPU" "Vs." "Emberwyn" "SONIC"
 
-echo "--------------------------------------------------------------"
+    echo "--------------------------------------------------------------"
 
-python src/score.py results.log
+    python src/score.py -a $MAX_ANGLE -n $MIN_NMS -c $CONFIDENCE -p $PADDING -l $LAYOUT results.log | tee -a scores.log
+# done

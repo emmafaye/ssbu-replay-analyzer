@@ -1,0 +1,18 @@
+Main Tasks:
+    ☐ Clean-up _parse_text() pre-processing code
+    ☐ Refactor main function to helper functions for various components
+    ☐ Remove contours from images to add clarity
+    ☐ Process Video Capture frames for entire video and extract text
+    ☐ Refactor processing to accept video or image
+    ☐ Add a function to add and store regions with (x,y,w,h) to parse for expected text
+    
+Extra Tasks:
+    ✔ Fix logging to output one stream when calling script without stdout @done(20-04-21 20:19)
+    ✔ Fix color in terminal @done(20-04-21 20:19)
+    ✔ Score results.log and average matches @done(20-04-21 20:19)
+    ✔ Tweak parameters for test.sh to get highest score with overall tests @done(20-04-21 20:19)
+    ☐ Fix colors breaking emojis and adding unicode in console output
+    ☐ Set logging level to `debug` for file and logging and `info` for console
+    ☐ Clean up output image paths to use relative directories instead of absolute
+    ☐ Output image path for each Found item
+    ☐ Add python-based progess bar for parsing

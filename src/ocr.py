@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import argparse
 import cv2 as cv
 import os
@@ -6,20 +8,21 @@ import glob
 import math
 import pytesseract
 import imutils
+import numpy as np
 import re
 import coloredlogs, logging
 
 from rect import Rect
 
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
 date_format = "%-H:%M:%S"
 log_format = "%(asctime)s [%(levelname)s] %(message)s"
-coloredlogs.install(datefmt=date_format, fmt=log_format, level="info", logger=logger)
+coloredlogs.install(datefmt=date_format, fmt=log_format, level=logging.INFO, logger=logger)
 
-
-handler = logging.StreamHandler(sys.stdout)
+handler = logging.FileHandler(os.path.join(os.path.dirname(os.path.realpath(__file__)), "../", "results.log"))
 formatter = logging.Formatter(log_format, date_format)
 handler.setFormatter(formatter)
+# handler.setLevel(logging.DEBUG)
 logger.addHandler(handler)
 
 class ParsedText(object):
@@ -121,26 +124,13 @@ class TextRecognizer(object):
         results = []
         
         for rect in search_rects:
-            # cropped = rect.crop_image(search_img)
-
-            # grayscale = cv.cvtColor(search_img, search_img, cv.COLOR_BGR2GRAY)
-
-            # image = imutils.resize(grayscale, width=400)
-            # blurred = cv.GaussianBlur(image, (7,7), 0)
-            #     # l, a, b = cv.split(blurred)
-            #     # thresh = cv.threshold(merged, 0, 255, (cv.THRESH_BINARY + cv.THRESH_OTSU))[1]
-            # (threshold, destination) = cv.threshold(blurred, 128, 255, cv.THRESH_BINARY | cv.THRESH_OTSU)
-            #     # search_img = 255 - thresh 
-
             grayscale = cv.imread(filename, cv.IMREAD_GRAYSCALE)
-            
-            blurred = cv.GaussianBlur(grayscale, (7,7), 0)
+            median = cv.medianBlur(grayscale, 1)
+            blurred = cv.GaussianBlur(median, (5,5), 0)
             cropped = rect.crop_image(blurred)
-            image = imutils.resize(cropped, width=400)
-            # (threshold, image) = cv.threshold(image, 128, 255, cv.THRESH_BINARY | cv.THRESH_OTSU)
+            resized = imutils.resize(cropped, width=400)
 
-            thresh = cv.threshold(image, 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU)[1]
-            image = 255 - thresh 
+            (_, image) = cv.threshold(resized, 128, 255, cv.THRESH_BINARY_INV | cv.THRESH_OTSU)
 
             result_text = pytesseract.image_to_string(image, lang="eng", config=options)
 
@@ -197,7 +187,7 @@ class TextRecognizer(object):
 def main():
     # python src/ocr.py images/player-names.png
     parser = argparse.ArgumentParser()
-    parser.add_argument("input",        type=str,                               help="Path to input image")
+    parser.add_argument("input",                type=str,                               help="Path to input image")
     parser.add_argument("-c", "--min-conf",     type=float, default=0.5,                help="Filter out results with confidence less than this value")
     parser.add_argument("-a", "--max-angle",    type=float, default=10,                 help="Filter out results with an angle greater than this value")
     parser.add_argument("-n", "--min-nms",      type=float, default=0.4,                help="Filter out results with a non-maximum supression score less than this value")
