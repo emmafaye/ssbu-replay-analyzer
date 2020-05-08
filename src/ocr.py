@@ -32,43 +32,52 @@ class ParsedText(object):
         self.rect = rect
 
     def __str__(self):
-        return '"{}" @ {}'.format(self.text, self.rect)
+        return f"'{self.text}' @ {self.rect}"
 
     def __repr__(self):
-        return '<ParsedText {}>'.format(str(self))
+        return f"<ParsedText {self}>"
 
 class TextLayout(object):
-    # 0  - Orientation and script detection (OSD) only.
-    # 1  - Automatic page segmentation with OSD.
-    # 2  - Automatic page segmentation, but no OSD, or OCR.
-    # 3  - Fully automatic page segmentation, but no OSD. (Default)
-    # 4  - Assume a single column of text of variable sizes.
-    # 5  - Assume a single uniform block of vertically aligned text.
-    # 6  - Assume a single uniform block of text.
-    # 7  - Treat the image as a single text line.
-    # 8  - Treat the image as a single word.
-    # 9  - Treat the image as a single word in a circle.
-    # 10 - Treat the image as a single character.
-    # 11 - Sparse text. Find as much text as possible in no particular order.
-    # 12 - Sparse text with OSD.
-    # 13 - Raw line. Treat the image as a single text line, bypassing hacks that are Tesseract-specific.
+    SCRIPT_ORIENTATION = 0      # Orientation and script detection (OSD) only.
+    PAGE_SEGMENTATION = 1       # Automatic page segmentation with OSD.
+    NO_OCR = 2                  # Automatic page segmentation, but no OSD, or OCR.
+    DEFAULT = 3                 # Fully automatic page segmentation, but no OSD. (Default)
+    COLUMN = 4                  # Assume a single column of text of variable sizes.
+    UNIFORM_BLOCK_VALIGN = 5    # Assume a single uniform block of vertically aligned text.
+    UNIFORM_BLOCK = 6           # Assume a single uniform block of text.
+    LINE = 7                    # Treat the image as a single text line.
+    WORD = 8                    # Treat the image as a single word.
+    SINGLE_WORD_CIRCLE = 9      # Treat the image as a single word in a circle.
+    CHARACTER = 10              # Treat the image as a single character.
+    SPARSE = 11                 # Sparse text. Find as much text as possible in no particular order.
+    SPARSE_OSD = 12             # Sparse text with OSD.
+    RAW_LINE = 13               # Raw line. Treat the image as a single text line, bypassing hacks that are Tesseract-specific.
 
-    COLUMN = 4
-    UNIFORM_BLOCK_VALIGN = 5
-    UNIFORM_BLOCK = 6
-    LINE = 7
-    WORD = 8
-    SPARSE = 11
-    RAW_LINE = 13
+    def __init__(self, layout):
+        super(TextLayout, self).__init__()
+        self.layout = layout
+
+    def validate(self):
+        if hasattr(self.layout, "isdigit") and (self.layout).isdigit() != True:
+            parsed_layout = self.layout.upper().replace(" ", "_")
+
+            if hasattr(self, parsed_layout):
+                logger.debug(f"Using PSM value '{self.layout}'")
+                self.layout = self.__getattribute__(parsed_layout)
+            else:
+                logger.error(f"PSM value '{self.layout}' is in not accepted by OpenCV, falling back to default layout")
+                self.layout = TextRecognizer.DEFAULT_LAYOUT
+
+        return self.layout
 
 class TextRecognizer(object):
-    WORKING_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)), "../")
-    TEXT_DETECTION_MODEL_PATH = os.path.join(WORKING_DIR, "data/text_detection.pb")
+    WORKING_DIR = os.path.normpath(os.path.join(os.path.dirname(__file__), ".."))
+    TEXT_DETECTION_MODEL_PATH = os.path.join(WORKING_DIR, "data", "text_detection.pb")
     TESSERACT_DATA_DIR = os.path.join(WORKING_DIR, "data")
-    IMAGES_DIR = os.path.join(WORKING_DIR, "assets/images")
-    OUTPUT_DIR = os.path.join(WORKING_DIR, "assets/output")
-    MATCHES_DIR = os.path.join(WORKING_DIR, "assets/matches")
-    VIDEOS_DIR = os.path.join(WORKING_DIR, "assets/videos")
+    IMAGES_DIR = os.path.join(WORKING_DIR, "assets", "images")
+    OUTPUT_DIR = os.path.join(WORKING_DIR, "assets", "output")
+    MATCHES_DIR = os.path.join(WORKING_DIR, "assets", "matches")
+    VIDEOS_DIR = os.path.join(WORKING_DIR, "assets", "videos")
     TESSERACT_OEM = 1
     DEFAULT_LAYOUT = TextLayout.LINE
 
@@ -79,11 +88,7 @@ class TextRecognizer(object):
         self.max_angle = max_angle
         self.min_nms = min_nms
         self.padding = max(0.0, min(padding, 1.0))
-
-    def find_text(self, search_img, layout=DEFAULT_LAYOUT):
-        located_rects = self._locate_text(search_img)
-        results = self._parse_text(search_img, located_rects, layout)
-        return results
+        self.regions = []
 
     def _locate_text(self, search_img):
         img_rect = Rect(0, 0, search_img.shape[1], search_img.shape[0])
@@ -119,8 +124,8 @@ class TextRecognizer(object):
 
         return results
 
-    def _parse_text(self, search_img, search_rects, text_layout, filename):
-        options = r'--tessdata-dir "{}" --oem {} --psm {}'.format(self.TESSERACT_DATA_DIR, self.TESSERACT_OEM, text_layout)
+    def _parse_text(self, search_img, filename, search_rects, text_layout, output=False):
+        options = f"--tessdata-dir '{self.TESSERACT_DATA_DIR}' --oem {self.TESSERACT_OEM} --psm {text_layout}"
         results = []
         
         for rect in search_rects:
@@ -134,9 +139,10 @@ class TextRecognizer(object):
 
             result_text = pytesseract.image_to_string(image, lang="eng", config=options)
 
-            matched_filename = os.path.basename(filename).replace(".", "-" + result_text + ".")
-            save_dir = os.path.join(self.MATCHES_DIR, matched_filename)
-            cv.imwrite(save_dir, image)
+            if output:
+                matched_filename = os.path.basename(filename).replace(".", f"-{result_text}.")
+                save_dir = os.path.join(self.MATCHES_DIR, matched_filename)
+                cv.imwrite(save_dir, image)
 
             if result_text is not None:
                 results.append(ParsedText(result_text, rect))
@@ -184,72 +190,104 @@ class TextRecognizer(object):
 
         return rects, confidences
 
+    # Generates red boxes around located text
+    def _generate_red_boxes(self, rects, image):
+        for rect in rects:
+            logger.debug(f"Located text at {rect}")
+            cv.rectangle(image, rect.top_left, rect.bottom_right, (255, 0, 0), 2, cv.LINE_AA)
+
+        return image
+
+    # Generates green boxes around parsed text w/ parsed text printed in purple
+    def _generate_green_boxes(self, regions, image):
+        for parsed in regions:
+            logger.debug(f"Parsed text '{parsed.text}' at {parsed.rect}")
+            cv.rectangle(image, parsed.rect.top_left, parsed.rect.bottom_right, (0, 255, 0), 1, cv.LINE_AA)
+            cv.putText(image, parsed.text, parsed.rect.top_left, cv.FONT_HERSHEY_PLAIN, 2, (0, 255, 0), 2, cv.LINE_AA)
+        
+        return image
+
+    def add_region(self, x=0, y=0, w=0, h=0):
+        self.regions.append(Rect(x, y, w, h))
+
+        return self.regions
+
+    def find_text(self, search_image, filename, layout=DEFAULT_LAYOUT, output=False, generate_boxes=False):
+        located_rects = self._locate_text(search_image)
+        output_image = search_image
+
+        if generate_boxes:
+            output_image = self._generate_red_boxes(located_rects, search_image)
+
+        results = self._parse_text(search_image, filename, located_rects, layout, output)
+
+        if generate_boxes:
+            output_image = self._generate_green_boxes(results, search_image)
+
+        return (output_image, results)
+
+    # Processes regions that have been stored
+    def process_regions(self, filename, layout, output=False, regions=None):
+        if regions is None:
+            regions = self.regions
+
+        search_image = cv.imread(filename)
+        output_image = search_image.copy()
+
+        results = self._parse_text(search_image, filename, self.regions, layout, output)
+
+        return results
+        
+    def process_image(self, filename, layout, output=False, generate_boxes=False):
+        search_image = cv.imread(filename)
+        output_image = search_image.copy()
+
+        (output_image, results) = self.find_text(search_image, filename, layout, output, generate_boxes)
+
+        if output:
+            output_dir = os.path.join(self.OUTPUT_DIR, os.path.basename(filename))
+            cv.imwrite(output_dir, output_image)
+            logger.info(f"📁 Output image save to {output_dir}")
+
+        return (output_image, results)
+
 def main():
-    # python src/ocr.py images/player-names.png
+    # Syntax Example: `python src/ocr.py images/player-names.png`
+
     parser = argparse.ArgumentParser()
     parser.add_argument("input",                type=str,                               help="Path to input image")
     parser.add_argument("-c", "--min-conf",     type=float, default=0.5,                help="Filter out results with confidence less than this value")
     parser.add_argument("-a", "--max-angle",    type=float, default=10,                 help="Filter out results with an angle greater than this value")
     parser.add_argument("-n", "--min-nms",      type=float, default=0.4,                help="Filter out results with a non-maximum supression score less than this value")
     parser.add_argument("-p", "--padding",      type=float, default=0.1,                help="Amount of padding to apply to dtected text rectangles, as a percentage of the rectangle dimensions")
-    parser.add_argument("-l", "--psm",          default=TextRecognizer.DEFAULT_LAYOUT,  help="Use specificed PSM Layout mode when running tesseract")
+    parser.add_argument("-l", "--layout",       default=TextRecognizer.DEFAULT_LAYOUT,  help="Use specificed PSM Layout mode when running tesseract")
     parser.add_argument("-d", "--display",      action="store_true",                    help="Display the result in a GUI window using display X")
-    parser.add_argument("-o", "--output",       type=str, nargs="?", const=True,        help="Save the generated image to a file, defaults to <filename>.ocr.<text>")
+    parser.add_argument("-o", "--output",       action="store_true", default=False,     help="Save the generated image to a file, defaults to <filename>.ocr.<text>")
     parser.add_argument("-t", "--test",         type=str, nargs="+",                    help="Test for the occurrence of a string in the input image. Exits with return code 0 if found, 1 otherwise")
     args = parser.parse_args()
-    
-    original_image = cv.imread(args.input)
-    output_image = original_image.copy()
 
+    layout = TextLayout(args.layout).validate()
     recognizer = TextRecognizer(args.min_conf, args.max_angle, args.min_nms, args.padding)
-    text_rects = recognizer._locate_text(original_image)
 
-    # Red boxes around located text
-    for found_rect in text_rects:
-        logger.debug("Located text at {}".format(found_rect))
-        cv.rectangle(output_image, found_rect.top_left, found_rect.bottom_right, (255, 0, 0), 2, cv.LINE_AA)
+    # recognizer.add_region(295, 200, 1160, 380) # GAME!
+    # recognizer.add_region(460, 915, 190, 25) # P1 Name Tag
+    # recognizer.add_region(1130, 915, 190, 25) # P2 Name Tag
+    # results = recognizer.process_regions(args.input, layout, args.output)
 
-    if hasattr(args.psm, "isdigit") and (args.psm).isdigit() != True:
-        psm = args.psm.upper().replace(" ", "_")
-        if hasattr(TextLayout, psm):
-            logger.debug("Using PSM value '" + args.psm + "'")
-            args.psm = TextLayout.__dict__[psm]
-        else:
-            logger.error("PSM value '" + args.psm + "' is in not accepted by OpenCV")
-
-    parsed_text = recognizer._parse_text(original_image, text_rects, args.psm, args.input)
-
-    # Green boxes around parsed text w/ parsed text printed in purple
-    for parsed in parsed_text:
-        logger.debug("Parsed text '" + parsed.text + "' at {}".format(parsed.rect))
-        cv.rectangle(output_image, parsed.rect.top_left, parsed.rect.bottom_right, (0, 255, 0), 1, cv.LINE_AA)
-
-        cv.putText(output_image, parsed.text, parsed.rect.top_left, cv.FONT_HERSHEY_PLAIN, 2, (255, 0, 255), 2, cv.LINE_AA)
-
-    # if args.output:
-        # output_path = args.output
-        # if output_path is True:
-        #     filename, ext = os.path.splitext(args.input)
-        #     output_path = "{}.ocr{}".format(filename, ext if ext else "")
-
-    save_dir = os.path.join(TextRecognizer.OUTPUT_DIR, os.path.basename(args.input))
-    cv.imwrite(save_dir, output_image)
-    logger.info("📁 Output image save to " + save_dir)
+    (output_image, results) = recognizer.process_image(args.input, layout, args.output, True)
 
     if args.test:
         for value in args.test:
             found_text = False
-            text_re = re.compile(value, re.IGNORECASE)
 
-            for parsed in parsed_text:
-                if text_re.match(parsed.text):
-                    (x, y, _, _) = parsed.rect
-                    logger.info("✔️  Found '" + value + "' at " + "(X: " + str(x) + ", Y: " + str(y) + ")")
+            for result in results:
+                if value.lower() == result.text.lower():
+                    logger.info(f"✔️  Found '{value}' at {result.rect}")
                     found_text = True
                     break
 
             if not found_text:
-                logger.info("❌ Absent '" + value + "'")
+                logger.info(f"❌ Absent '{value}'")
 
     if args.display:
         cv.imshow("", output_image)

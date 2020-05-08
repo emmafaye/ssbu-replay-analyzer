@@ -14,7 +14,8 @@
 		"remote.extensionKind": {
 			"ms-azuretools.vscode-docker": [ "workspace" ],
 			"thomaskarachristos.terminal-statusbar": [ "workspace" ],
-			"msjsdiag.debugger-for-chrome": [ "workspace" ]
+			"msjsdiag.debugger-for-chrome": [ "workspace" ],
+			"fabiospampinato.vscode-todo-plus": [ "workspace"]
 		},
 		"git.enableSmartCommit": true,
 		"terminal.integrated.shell.windows": "C:\\Program Files\\Git\\bin\\bash.exe",
@@ -29,8 +30,10 @@
 		"files.exclude": {
 			"**/__pycache__": true
 		},
+		"python.linting.pylintEnabled": true,
+		"python.linting.enabled": true,
 		"python.pythonPath": "/usr/local/bin/python",
-		"python.jediEnabled": true,
+		"python.jediEnabled": false,
 		"python.linting.pylintArgs": ["--load-plugins"],
 		"editor.suggestSelection": "first",
 		"vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
@@ -45,12 +48,11 @@
 	"extensions": [
 		"hookyqr.beautify",
 		"ms-azuretools.vscode-docker",
-		"dbaeumer.vscode-eslint",
-		"dbaeumer.jshint",
 		"ms-python.python",
 		"visualstudioexptteam.vscodeintellicode",
 		"thomaskarachristos.terminal-statusbar",
-		"mutantdino.resourcemonitor"
+		"mutantdino.resourcemonitor",
+		"axosoft.gitkraken-glo"
 	],
 
 	"shutdownAction": "stopContainer"
