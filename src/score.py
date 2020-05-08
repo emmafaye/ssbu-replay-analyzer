@@ -29,6 +29,8 @@ with open(args.log, 'r') as reader:
 found = len(found_lines)
 absent = len(absent_lines)
 parsed = len(parsed_lines)
+score_icon = "🔴"
+score = 0
 
 if found != 0 and absent != 0:
     total = found + absent
@@ -41,7 +43,8 @@ if found != 0 and absent != 0:
     else:
         score_icon = "🔴"
 
-    print("🧪 Total Tests:", total, "| ✔️  Total Found:", found, "| ❌ Total Absent:", absent, "| 💬 Toatal Words:", parsed)
-    print(score_icon, "Score:", str(score) + "%", "| Layout:", args.layout, "| Padding:", args.padding, "| Conf:", args.min_conf, "| NMS:", args.min_nms, "| Angle:", args.max_angle)
+    print(f"🧪 Total Tests: {total}, | ✔️  Total Found: {found}, | ❌ Total Absent: {absent}, | 💬 Toatal Words: {parsed}")
 else:
     print("⚠️ No Results found, check your test inputs and results.")
+
+print(f"{score_icon} Score: {score}% | Layout: {args.layout} | Padding: {args.padding} | Conf: {args.min_conf} | NMS: {args.min_nms} | Angle: {args.max_angle}")

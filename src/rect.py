@@ -11,7 +11,7 @@ class Rect(object):
         elif nargs == 0:
             self._rect = [0, 0, 0, 0]
         else: 
-            raise ValueError("Invalid arguments to Rect: {}".format(args))
+            raise ValueError(f"Invalid arguments to Rect: {args}")
 
     def __iter__(self):
         for val in self._rect:
@@ -24,10 +24,10 @@ class Rect(object):
         self._rect[key] = val
     
     def __str__(self):
-        return "{{x: {}, y: {}, w: {}, h: {}}}".format(self.x, self.y, self.w, self.h)
+        return f"{{x: {self.x}, y: {self.y}, w: {self.w}, h: {self.h}}}"
 
     def __repr__(self):
-        return "<Rect {}>".format(str(self))
+        return f"<Rect {self}>"
 
     def __eq__(self, other):
         return self._rect == list(other)
