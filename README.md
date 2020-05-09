@@ -4,7 +4,7 @@
 > ---
 > ⭐ this repo for a future release or feel free to [assign an open issue](https://app.gitkraken.com/glo/board/XrS7JWywTgARK-KY) to yourself!
 
-Replay Analyzer for Smash Ultimate is for content-creators, shoutcasters, professional's and casuals to improve their content delivery and reviews of replays. This project was born out of Nintendo's lack of support for a user-friendly replay viewer that allows easy sharing and review.
+Replay Analyzer for Smash Ultimate is for content-creators, shoutcasters, professionals, and casuals seeking to improve their content delivery and reviews of replays. This project was born out of Nintendo's lack of support for a user-friendly replay viewer that allows easy sharing and review.
 
 ## Features
 
