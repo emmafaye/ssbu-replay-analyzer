@@ -1,7 +1,7 @@
 // For format details, see https://aka.ms/vscode-remote/devcontainer.json or this file's README at:
 // https://github.com/microsoft/vscode-dev-containers/tree/v0.106.0/containers/docker-existing-dockerfile
 {
-	"name": "ssbu-match-analyzer",
+	"name": "ssbu-replay-analyzer",
 
 	// Sets the run context to one level up instead of the .devcontainer folder.
 	"context": "..",
@@ -52,7 +52,7 @@
 		"visualstudioexptteam.vscodeintellicode",
 		"thomaskarachristos.terminal-statusbar",
 		"mutantdino.resourcemonitor",
-		"axosoft.gitkraken-glo"
+		"github.vscode-pull-request-github"
 	],
 
 	"shutdownAction": "stopContainer"
