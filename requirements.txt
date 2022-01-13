@@ -3,5 +3,5 @@ humanfriendly==8.1
 imutils==0.5.3
 numpy==1.18.2
 opencv-contrib-python==4.2.0.32
-Pillow==7.0.0
+Pillow==9.0.0
 pytesseract==0.3.3
