@@ -1,7 +1,7 @@
 coloredlogs==14.0
 humanfriendly==8.1
 imutils==0.5.3
-numpy==1.18.2
+numpy==1.21.0
 opencv-contrib-python==4.2.0.32
 Pillow==9.0.1
 pytesseract==0.3.3
